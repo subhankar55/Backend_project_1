@@ -1,0 +1,24 @@
+{
+  "name": "backend_project_1",
+  "version": "1.0.0",
+  "description": "This is a backend project for learning",
+  "keywords": [
+    "javascript",
+    "backend"
+  ],
+  "homepage": "https://github.com/subhankar55/Backend_project_1#readme",
+  "bugs": {
+    "url": "https://github.com/subhankar55/Backend_project_1/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/subhankar55/Backend_project_1.git"
+  },
+  "license": "ISC",
+  "author": "Subhankar_Maiti",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  }
+}
