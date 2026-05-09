@@ -26,6 +26,7 @@ const uploadOnCloudinary = async function(localFilePath) {
        });
     
     //console.log(uploadResult);
+    fs.unlinkSync(localFilePath);
     return uploadResult;
     
     // Optimize delivery by resizing and applying auto-format and auto-quality
