@@ -3,7 +3,7 @@ import ApiError from "../utils/ApiError.js";
 import jwt from "jsonwebtoken";
 import {User} from "../models/user.model.js";
 
-
+// custom middleware : this middleware insert an user object in req extracting it from cookie
 
 export const verifyJWT = asyncHandler(async (req,res,next) => {
 

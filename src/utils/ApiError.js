@@ -20,3 +20,5 @@ class ApiError extends Error{
 }
 
 export default ApiError;
+
+// class to return api error
