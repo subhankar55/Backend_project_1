@@ -1,7 +1,7 @@
 import asyncHandler from "../utils/asyncHandler.js";
 import ApiError from "../utils/ApiError.js";
 import {User} from "../models/user.model.js";
-import uploadOnCloudinary from "../utils/cloudinary.js";
+import uploadOnCloudinary,{deleteOnCloudinary} from "../utils/cloudinary.js";
 import ApiResponse from "../utils/ApiResponse.js";
 import jwt from "jsonwebtoken";
 import { Subscription } from "../models/subscription.model.js";
@@ -25,6 +25,17 @@ const generateAccessAndRefreshToken = async (userId) => {
     }
 }
 
+// Extracting cloudinary upload public_id from url
+
+const getPublicIdfromURL = (url) =>{
+
+    const parts = url.split("/");
+    const filename = parts.pop();
+    const publicname = filename.split(".")[0];
+
+    const publicId = `${publicname}`;
+    return publicId;
+}
 
 const registerUser = asyncHandler(
     async (req,res) => {
@@ -271,6 +282,16 @@ const updateUserAvatar = asyncHandler(
         
         if(!avatarLocalPath){
             throw new ApiError(400,"Avatar file is missing");
+
+        }
+        const oldAvatar = req.user.avatar;
+        if(oldAvatar){
+            const publicId = getPublicIdfromURL(oldAvatar);
+            const result = await deleteOnCloudinary(publicId);
+            if(!result){
+                throw new ApiError(500,"Avatar deletion failed");
+
+            }
 
         }
         const avatar = await uploadOnCloudinary(avatarLocalPath);

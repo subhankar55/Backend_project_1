@@ -1,5 +1,7 @@
 import { v2 as cloudinary } from 'cloudinary';
 import fs from "fs";  
+import dotenv from "dotenv";
+dotenv.config();
 
 
 const uploadOnCloudinary = async function(localFilePath) {
@@ -47,5 +49,22 @@ const uploadOnCloudinary = async function(localFilePath) {
     
     // console.log(autoCropUrl);    
 };
+
+export const deleteOnCloudinary = async function(publicId) {
+    
+    try {
+        if(!publicId) return null;
+
+        const result = await cloudinary.uploader.destroy(publicId);
+        console.log(result);
+
+        return result;
+    } catch (error) {
+        
+        console.log(error.message);
+        return null;
+    }
+}
+
 
 export default uploadOnCloudinary;
