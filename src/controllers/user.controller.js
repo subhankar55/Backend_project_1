@@ -330,6 +330,17 @@ const updateUsercoverImage = asyncHandler(
             throw new ApiError(400,"coverImage file is missing");
 
         }
+        const oldCoverImage = req.user.coverImage;
+        if(oldCoverImage){
+            const publicId = getPublicIdfromURL(oldCoverImage);
+            const result = await deleteOnCloudinary(publicId);
+            if(!result){
+                throw new ApiError(500,"coverImage deletion failed");
+
+            }
+
+        }
+
         const coverImage = await uploadOnCloudinary(coverImageLocalPath);
         
         if(!coverImage.url){
