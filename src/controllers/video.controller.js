@@ -8,7 +8,7 @@ import {uploadOnCloudinary} from "../utils/cloudinary.js"
 
 
 const getAllVideos = asyncHandler(async (req, res) => {
-    const { page = 1, limit = 10, query, sortBy, sortType, userId } = req.query
+    const { page = 1, limit = 10, query, sortBy="createdAt", sortType="desc", userId } = req.query
     //TODO: get all videos based on query, sort, pagination
     // filter the videos based on query or userId or both based on availablity
     // sort them using sortBy and sortType 
@@ -23,9 +23,29 @@ const getAllVideos = asyncHandler(async (req, res) => {
             $options: "i"
         }
     }
-    if(userId){
+    if(userId && mongoose.Types.ObjectId.isValid(userId)){
         filter.owner = new mongoose.Types.ObjectId(userId)
     }
+
+    const sortOptions = {};
+
+    sortOptions[sortBy] = sortType === "asc" ? 1 : -1;
+
+    const limitNum = Number(limit) || 10;
+    const pageNum = Number(page) || 1;
+
+    const skip = (pageNum - 1) * limitNum;
+
+    const videos = await Video.find(filter)
+    .sort(sortOptions)
+    .skip(skip)
+    .limit(limitNum)
+
+    return res
+    .status(200)
+    .json(
+        new ApiResponse(200,videos,"Videos fetched successfully")
+    )
 
 
 })
