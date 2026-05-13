@@ -51,6 +51,13 @@ const uploadOnCloudinary = async function(localFilePath) {
 };
 
 export const deleteOnCloudinary = async function(publicId) {
+
+    cloudinary.config({ 
+        cloud_name: process.env.CLOUDINARY_CLOUD_NAME, 
+        api_key: process.env.CLOUDINARY_API_KEY, 
+        api_secret: process.env.CLOUDINARY_API_SECRET
+     // Click 'View API Keys' above to copy your API secret
+    });
     
     try {
         if(!publicId) return null;
@@ -60,7 +67,7 @@ export const deleteOnCloudinary = async function(publicId) {
 
         return result;
     } catch (error) {
-        
+
         console.log(error.message);
         return null;
     }
