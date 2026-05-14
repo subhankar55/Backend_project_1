@@ -4,11 +4,11 @@ import {User} from "../models/user.model.js"
 import {ApiError} from "../utils/ApiError.js"
 import {ApiResponse} from "../utils/ApiResponse.js"
 import {asyncHandler} from "../utils/asyncHandler.js"
-import {uploadOnCloudinary} from "../utils/cloudinary.js"
+import {getThumbnailUrl, uploadOnCloudinary} from "../utils/cloudinary.js"
 
 
 const getAllVideos = asyncHandler(async (req, res) => {
-    const { page = 1, limit = 10, query, sortBy="createdAt", sortType="desc", userId } = req.query
+    const { page = 1, limit = 10, query, sortBy="createdAt", sortType="desc", userId } = req.query;
     //TODO: get all videos based on query, sort, pagination
     // filter the videos based on query or userId or both based on availablity
     // sort them using sortBy and sortType 
@@ -22,10 +22,10 @@ const getAllVideos = asyncHandler(async (req, res) => {
             $regex: query,
             $options: "i"
         }
-    }
+    };
     if(userId && mongoose.Types.ObjectId.isValid(userId)){
         filter.owner = new mongoose.Types.ObjectId(userId)
-    }
+    };
 
     const sortOptions = {};
 
@@ -39,13 +39,13 @@ const getAllVideos = asyncHandler(async (req, res) => {
     const videos = await Video.find(filter)
     .sort(sortOptions)
     .skip(skip)
-    .limit(limitNum)
+    .limit(limitNum);
 
     return res
     .status(200)
     .json(
         new ApiResponse(200,videos,"Videos fetched successfully")
-    )
+    );
 
 
 })
@@ -53,6 +53,56 @@ const getAllVideos = asyncHandler(async (req, res) => {
 const publishAVideo = asyncHandler(async (req, res) => {
     const { title, description} = req.body
     // TODO: get video, upload to cloudinary, create video
+    // validate the info
+    // upload the video file in local storage using multer
+    // upload the video file to cloudinary
+    // get video url
+    // get thumbnail url
+    // set title and description
+    // get duration from cloudinary
+    // keep views 0 for now
+    // make is published true
+    // and set the owner from user info
+    // now return a response
+
+    if([title,description].some((field) => field?.trim() === "")){
+        throw new ApiError(400,"All fields are required");
+    };
+
+    const videoLocalPath = req.file?.path;
+    
+    if(!videoLocalPath){
+        throw new ApiError(400,"Video file is missing");
+    }
+
+    const videoFile = await uploadOnCloudinary(videoLocalPath);
+
+    if(!videoFile){
+        throw new ApiError(400,"Video upload failed");
+    }
+
+    const publicId = videoFile.public_id;
+
+    const thumbnail = getThumbnailUrl(publicId);
+
+    const video = await Video.create({
+        videoFile:videoFile.url,
+        thumbnail,
+        title,
+        description,
+        duration:videoFile.duration,
+        views:0,
+        isPublished:true,
+        owner:req.user._id
+    })
+
+    return res
+    .status(201)
+    .json(
+        new ApiResponse(201,video,"Video published successfully")
+    )
+
+
 })
 
 const getVideoById = asyncHandler(async (req, res) => {

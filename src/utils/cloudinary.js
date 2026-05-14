@@ -3,9 +3,7 @@ import fs from "fs";
 import dotenv from "dotenv";
 dotenv.config();
 
-
-const uploadOnCloudinary = async function(localFilePath) {
-      // Configuration
+// Configuration
         cloudinary.config({ 
         cloud_name: process.env.CLOUDINARY_CLOUD_NAME, 
         api_key: process.env.CLOUDINARY_API_KEY, 
@@ -13,6 +11,9 @@ const uploadOnCloudinary = async function(localFilePath) {
      // Click 'View API Keys' above to copy your API secret
     });
     
+
+const uploadOnCloudinary = async function(localFilePath) {
+      
     if(!localFilePath) return null;
     // Upload an image
      const uploadResult = await cloudinary.uploader
@@ -28,7 +29,10 @@ const uploadOnCloudinary = async function(localFilePath) {
        });
     
     //console.log(uploadResult);
-    fs.unlinkSync(localFilePath);
+    if (fs.existsSync(localFilePath)) {
+        fs.unlinkSync(localFilePath);
+    }
+
     return uploadResult;
     
     // Optimize delivery by resizing and applying auto-format and auto-quality
@@ -51,13 +55,6 @@ const uploadOnCloudinary = async function(localFilePath) {
 };
 
 export const deleteOnCloudinary = async function(publicId) {
-
-    cloudinary.config({ 
-        cloud_name: process.env.CLOUDINARY_CLOUD_NAME, 
-        api_key: process.env.CLOUDINARY_API_KEY, 
-        api_secret: process.env.CLOUDINARY_API_SECRET
-     // Click 'View API Keys' above to copy your API secret
-    });
     
     try {
         if(!publicId) return null;
@@ -73,5 +70,13 @@ export const deleteOnCloudinary = async function(publicId) {
     }
 }
 
+export const getThumbnailUrl = function (publicId) {
+    
+    return cloudinary.url(publicId,{
+        resource_type:"video",
+        format:"jpg"
+    })
+
+}
 
 export default uploadOnCloudinary;
