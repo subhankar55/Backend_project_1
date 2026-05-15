@@ -5,6 +5,8 @@ import { publishAVideo,
          getAllVideos,
          updateVideo,
          getVideoById,
+         deleteVideo,
+         togglePublishStatus
  } from "../controllers/video.controller.js";
 
 
@@ -16,7 +18,11 @@ router.route("/get-all-videos").get(getAllVideos);
 
 router.route("/get-video/:videoId").get(getVideoById);
 
-router.route("/update-video/:videoId").post(upload.single("thumbnail"),updateVideo);
+router.route("/update-video/:videoId").patch(upload.single("thumbnail"),updateVideo);
+
+router.route("/delete/:videoId").delete(verifyJWT,deleteVideo);
+
+router.route("/toggle-publish/:videoId").patch(verifyJWT,togglePublishStatus);
 
 
 

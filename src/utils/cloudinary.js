@@ -54,12 +54,14 @@ const uploadOnCloudinary = async function(localFilePath) {
     // console.log(autoCropUrl);    
 };
 
-export const deleteOnCloudinary = async function(publicId) {
+export const deleteOnCloudinary = async function(publicId,resource) {
     
     try {
         if(!publicId) return null;
 
-        const result = await cloudinary.uploader.destroy(publicId);
+        const result = await cloudinary.uploader.destroy(publicId,{
+            resource_type:resource || "image"
+        });
         console.log(result);
 
         return result;
