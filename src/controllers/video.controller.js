@@ -202,13 +202,61 @@ const updateVideo = asyncHandler(async (req, res) => {
 })
 
 const deleteVideo = asyncHandler(async (req, res) => {
-    const { videoId } = req.params
+    const { videoId } = req.params;
     //TODO: delete video
-    
+    // validate the video id
+    // access the video details by videoId from database
+    // using video url findout the video publicId 
+    // delete the video from cloudinary using publicId
+    // delete the video details from database
+    // return ok response
+
+    if(!videoId || !mongoose.Types.ObjectId.isValid(videoId)){
+        throw new ApiError(400,"Invalid video id");
+    }
+
+    const video = await Video.findById(videoId);
+    if(!video){
+        throw new ApiError(404,"Video not found");
+    }
+
+    const publicId = getPublicIdfromURL(video.videoFile);
+    const result = await deleteOnCloudinary(publicId);
+    if(!result){
+        throw new ApiError(500,"Video deletion failed");
+    }
+
+    await video.deleteOne();
+
+    return res
+    .status(200)
+    .json(
+        new ApiResponse(200,null,"Video deleted successfully")
+    )
 })
 
 const togglePublishStatus = asyncHandler(async (req, res) => {
-    const { videoId } = req.params
+    const { videoId } = req.params;
+    //TODO: toggle video publish status
+    // validate videoid
+    // get video details from videoId from db
+    // toggle the status
+    // return response
+    if(!videoId || !mongoose.Types.ObjectId.isValid(videoId)){
+        throw new ApiError(400,"Invalid video id");
+    }
+    const video = await Video.findById(videoId);
+    if(!video){
+        throw new ApiError(404,"Video not found");
+    }
+    video.isPublished = !video.isPublished;
+    await video.save({validateBeforeSave:false});
+    return res
+    .status(200)        
+    .json(
+        new ApiResponse(200,video,"Video publish status toggled successfully")
+    )
+
 })
 
 export {
