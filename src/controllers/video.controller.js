@@ -6,6 +6,19 @@ import ApiResponse from "../utils/ApiResponse.js"
 import asyncHandler from "../utils/asyncHandler.js"
 import uploadOnCloudinary,{getThumbnailUrl, deleteOnCloudinary} from "../utils/cloudinary.js"
 
+const getPublicIdfromURL = (url) =>{
+
+    const parts = url.split("/");
+    const filename = parts.pop();
+    const publicId = filename.split(".")[0];
+
+    if(!publicId) {
+        throw new ApiError(500,"Public id not found");
+    }
+
+    return publicId;
+}
+
 
 const getAllVideos = asyncHandler(async (req, res) => {
     const { page = 1, limit = 10, query, sortBy="createdAt", sortType="desc", userId } = req.query;
@@ -152,12 +165,23 @@ const updateVideo = asyncHandler(async (req, res) => {
     if(!video){
         throw new ApiError(404,"Video not found");
     }
-   
+    // delete the old thumbnail from cloudinary
+
     if(thumbnailLocalPath){
         const uploadedThumbnail = await uploadOnCloudinary(thumbnailLocalPath);
         if(!uploadedThumbnail){
             throw new ApiError(400,"Thumbnail upload failed");
         }
+
+        const publicId = getPublicIdfromURL(video.thumbnail);
+        const videoPublicId = getPublicIdfromURL(video.videoFile);
+        if(publicId != videoPublicId){
+            const result = await deleteOnCloudinary(publicId);
+            if(!result){
+                throw new ApiError(500,"Thumbnail deletion failed");
+            }
+        }
+        
         video.thumbnail = uploadedThumbnail.url;
     }
     if(title){
@@ -174,9 +198,6 @@ const updateVideo = asyncHandler(async (req, res) => {
     .json(
         new ApiResponse(200,video,"Video updated successfully") 
         )
-    
-        // TODO: delete before update
-
 
 })
 
