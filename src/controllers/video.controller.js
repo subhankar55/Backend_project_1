@@ -123,12 +123,33 @@ const getVideoById = asyncHandler(async (req, res) => {
     //TODO: get video by id
     // validate videoid
     // search in database
+    // increment the view and save in db
     // return the video
 
     if(!videoId || !mongoose.Types.ObjectId.isValid(videoId)){
         throw new ApiError(400,"Invalid video id");
     }
     const video = await Video.findById(videoId);
+
+    if(!video){
+        throw new ApiError(404,"Video not found");
+    }
+    
+    await User.findByIdAndUpdate(
+        req.user._id,
+        {
+            $push:{
+                watchHistory:videoId
+            }
+        },
+        {
+            new:true
+        }
+    )
+
+    video.views += 1;
+    await video.save({validateBeforeSave:false});
+
     return res
     .status(200)
     .json(
@@ -258,6 +279,7 @@ const togglePublishStatus = asyncHandler(async (req, res) => {
     )
 
 })
+
 
 export {
     getAllVideos,
