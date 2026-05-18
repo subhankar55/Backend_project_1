@@ -14,6 +14,7 @@ const createPlaylist = asyncHandler(async (req, res) => {
     // validate userId also
     // create a new document by this info of Playlist schema and return that document in res
 
+
     if(!name || !description   ){
         throw new ApiError(400,"All fields are required");
     }
@@ -50,6 +51,7 @@ const getUserPlaylists = asyncHandler(async (req, res) => {
     const playlists = await Playlist.find({
         owner:userId
     })
+    console.log(playlists);
     if(!playlists?.length){
         throw new ApiError(404,"No playlist found");
     }
@@ -148,7 +150,7 @@ const deletePlaylist = asyncHandler(async (req, res) => {
         throw new ApiError(400,"Invalid playlist id");  
     }
     const playlist = await Playlist.findById(playlistId);
-    playlist.delete();
+    playlist.delete;
     return res
     .status(200)
     .json(
