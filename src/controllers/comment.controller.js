@@ -1,4 +1,4 @@
-import mongoose from "mongoose"
+import mongoose,{isValidObjectId} from "mongoose"
 import {Comment} from "../models/comment.model.js"
 import ApiError from "../utils/ApiError.js"
 import ApiResponse from "../utils/ApiResponse.js"
@@ -14,7 +14,7 @@ const getVideoComments = asyncHandler(async (req, res) => {
     // set limit to get that amount of comments
     // return response
 
-    if(!videoId || !mongoose.Types.ObjectId(videoId)){
+    if(!videoId || !isValidObjectId(videoId)){
         throw new ApiError(400,"Invalid video id");
     }
     const skip = (Number(page) - 1) * Number(limit);
@@ -45,7 +45,7 @@ const addComment = asyncHandler(async (req, res) => {
 
     const {videoId} = req.params;
     const {content} = req.body;
-    if(!videoId || !mongoose.Types.ObjectId(videoId)){
+    if(!videoId || !isValidObjectId(videoId)){
         throw new ApiError(400,"Invalid video id");
     }
     if(content.trim() === ""){
@@ -84,7 +84,7 @@ const updateComment = asyncHandler(async (req, res) => {
     const {commentId} = req.params;
     const {content} = req.body;
 
-    if(!commentId || !mongoose.Types.ObjectId(commentId)){
+    if(!commentId || !isValidObjectId(commentId)){
         throw new ApiError(400,"Invalid comment id");
     
     }
@@ -113,9 +113,9 @@ const deleteComment = asyncHandler(async (req, res) => {
     // return response
 
 
-    const commentId = req.params;
+    const {commentId} = req.params;
 
-    if(!commentId || !mongoose.Types.ObjectId(commentId)){
+    if(!commentId || !isValidObjectId(commentId)){
         throw new ApiError(400,"Invalid comment id");
 
     }

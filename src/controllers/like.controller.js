@@ -13,7 +13,7 @@ const toggleVideoLike = asyncHandler(async (req, res) => {
     // if does not exist create
     // return res
 
-    if(!videoId || !mongoose.Types.ObjectId.isValid(videoId)){
+    if(!videoId || !isValidObjectId(videoId)){
         throw new ApiError(400,"Invalid video id");
     }
     const like = await Like.findOne({
@@ -49,7 +49,7 @@ const toggleCommentLike = asyncHandler(async (req, res) => {
     // else create a new Like
     // return response
 
-    if(!commentId || !mongoose.Types.ObjectId){
+    if(!commentId || !isValidObjectId(commentId)){
         throw new ApiError(400,"Invalid comment id");
     }
     const like = await Like.findOne({
@@ -86,7 +86,7 @@ const toggleTweetLike = asyncHandler(async (req, res) => {
     // if like exists delete it
     // else create a new one
     // return response
-    if(!tweetId || !mongoose.Types.ObjectId.isValid(tweetId)){
+    if(!tweetId || !isValidObjectId(tweetId)){
         throw new ApiError(400,"Invalid tweet id");
     }
     const like = await Like.findOne({
